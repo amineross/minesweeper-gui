@@ -16,7 +16,7 @@ Ce rapport présente notre plan de travail et notre stratégie de test pour le d
     -   S'assurer de l'interaction fluide entre l'utilisateur et l'interface graphique.
     -   Collaborer avec Selma pour l'intégration du design des cases.
 
-- **Selma (Design de l'Interface et Programmation)**
+- **Salma (Design de l'Interface et Programmation)**
     -   Concevoir l'interface utilisateur du jeu.
     -   Travailler avec Reda pour intégrer le design dans le jeu.
     -   S'initier à la programmation en Java pour aider dans des tâches simples de codage.
