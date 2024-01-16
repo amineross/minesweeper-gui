@@ -25,6 +25,11 @@ public class Game
         this.status = 0;
         this.grid = new Grid(dimension, nbBombes);
     }
+
+    public Grid getGrid()
+    {
+        return this.grid;
+    }
     public void startGame()
     {
         this.status = 1;

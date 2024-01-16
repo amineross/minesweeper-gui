@@ -40,11 +40,24 @@ public class Grid
             {
                 boxes[x][y].setContainsBomb(true);
                 nbBombsSet++;
-                // TODO: update neighbor cells
+                updateNeighborBoxes(x, y);
             }
         }
     }
 
+    private void updateNeighborBoxes(int x, int y)
+    {
+        for (int i = x - 1; i <= x+1 ; i++)
+        {
+            for (int j = y - 1; j <= y+1; j++)
+            {
+                if (i >= 0 && i < dimension && j >= 0 && j < dimension && !(i == x && j == y))
+                {
+                    boxes[i][j].incrementNbNeighborBombs();
+                }
+            }
+        }
+    }
     public void revealBox(int x, int y)
     {
         if (x >= dimension || y >= dimension)
@@ -69,6 +82,34 @@ public class Grid
         if (x < dimension && y < dimension)
         {
             boxes[x][y].setFlagged();
+        }
+    }
+
+    public void printGrid()
+    {
+        for (int i = 0; i<dimension; i++)
+        {
+            for (int j = 0; j<dimension; j++)
+            {
+                Box box = boxes[i][j];
+                if (box.revealed())
+                {
+                    if (box.containsBomb())
+                    {
+                        System.out.print("*");
+                    } else if (box.getNbNeighborBombs() != 0)
+                    {
+                        System.out.print(box.getNbNeighborBombs());
+                    } else
+                    {
+                        System.out.print("");
+                    }
+                } else
+                {
+                    System.out.print(".");
+                }
+            }
+            System.out.println();
         }
     }
 }
