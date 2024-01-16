@@ -1,6 +1,6 @@
-package main.java.game;
+package game;
 
-public class Application
+public class App
 {
     private boolean started;
     private int height;
@@ -10,7 +10,7 @@ public class Application
     private Player player;
     private Grid grid;
 
-    public Application(int height, int width)
+    public App(int height, int width)
     {
         this.height = height;
         this.width = width;
