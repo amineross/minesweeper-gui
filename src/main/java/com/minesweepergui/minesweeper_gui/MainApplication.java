@@ -1,10 +1,6 @@
 package com.minesweepergui.minesweeper_gui;
 
-import game.App;
-import game.Box;
-import game.Game;
-import game.Grid;
-import game.Player;
+import game.*;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -12,14 +8,28 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
-public class MainApplication extends Application {
+import javafx.scene.control.TextInputDialog;
+import java.util.Optional;
+
+/**
+ * Main application class for the Minesweeper game.
+ * This class is responsible for initializing and displaying the primary stage of the application,
+ * handling menu actions, and orchestrating the game logic and UI components.
+ */
+public class MainApplication extends Application
+{
     private static final int GRID_SIZE = 10;
     private static final int IMAGE_SIZE = 40;
     private static final int NUM_BOMBS = 10;
@@ -28,8 +38,8 @@ public class MainApplication extends Application {
     App app;
 
     Game currentGame;
-    private Map<String, Image> imageMap = new HashMap<>();
-    private Button[][] buttons = new Button[GRID_SIZE][GRID_SIZE];
+    private final Map<String, Image> imageMap = new HashMap<>();
+    private final Button[][] buttons = new Button[GRID_SIZE][GRID_SIZE];
 
     public void showMainMenu()
     {
@@ -39,11 +49,19 @@ public class MainApplication extends Application {
         primaryStage.show();
     }
 
-    private void showEndGameMenu(boolean isGameWon)
+    public void showEndGameMenu(boolean isGameWon)
     {
         EndGameMenu endGameMenu = new EndGameMenu(this, isGameWon);
         primaryStage.setScene(new Scene(endGameMenu, 300, 200));
         primaryStage.setTitle(isGameWon ? "Game Won" : "Game");
+        primaryStage.show();
+    }
+
+    public void showStatsMenu()
+    {
+        StatsMenu statsMenu = new StatsMenu(this);
+        primaryStage.setScene(new Scene(statsMenu, 400, 600));
+        primaryStage.setTitle("Player Statistics");
         primaryStage.show();
     }
 
@@ -54,18 +72,38 @@ public class MainApplication extends Application {
         showMainMenu();
     }
 
-    public void startGame()
-    {
-        Player player = new Player("Amine");
+    public void startNewGame() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("New Game");
+        dialog.setHeaderText("Enter your username:");
+        dialog.setContentText("Username:");
 
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(username -> {
+            Player player = new Player(username);
+            PlayerStorage.savePlayer(player);
+            startGame(player, false);
+        });
+    }
+
+    public void startGame(Player player, boolean isLoadedGame)
+    {
         loadImages();
         app = new App();
         app.startApplication();
-        app.startNewGame(GRID_SIZE, NUM_BOMBS, player);
+
+        if (isLoadedGame)
+        {
+            app.setCurrentGame(this.currentGame);
+        } else
+        {
+            app.startNewGame(GRID_SIZE, NUM_BOMBS, player);
+        }
 
         currentGame = app.getCurrentGame();
 
-        primaryStage.setTitle("Minesweeper");
+        MenuBar menuBar = createGameMenuBar();
+
         GridPane gridPane = new GridPane();
 
         for (int i = 0; i < GRID_SIZE; i++) {
@@ -76,14 +114,55 @@ public class MainApplication extends Application {
             }
         }
 
-        Scene scene = new Scene(gridPane);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(menuBar);
+        borderPane.setCenter(gridPane);
+
+        updateAllButtonImages();
+
+        Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
+        primaryStage.setTitle(String.format("Minesweeper - %s", player.getName()));
         primaryStage.show();
+    }
+
+    private void saveGame()
+    {
+        TextInputDialog dialog = new TextInputDialog("savegame");
+        dialog.setTitle("Save Game");
+        dialog.setHeaderText("Save your game");
+        dialog.setContentText("Enter file name:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(fileName -> {
+            String filePath = fileName.endsWith(".json") ? fileName : fileName + ".json";
+            SaveGame.saveGame(currentGame, filePath);
+        });
     }
 
     public void loadGame()
     {
-        System.out.println("Load Game");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Save game File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Save Game Files", "*.json"));
+
+        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        if (selectedFile != null)
+        {
+            Game loadedGame = SaveGame.loadGame(selectedFile.getAbsolutePath());
+            if (loadedGame != null)
+            {
+                this.currentGame = loadedGame;
+                startGame(loadedGame.getPlayer(), true);
+            }
+        }
+    }
+
+    private void resetGame()
+    {
+        currentGame.resetGame();
+        updateAllButtonImages();
     }
 
     public void quitApplication()
@@ -102,8 +181,24 @@ public class MainApplication extends Application {
 
         Box clickedBox = currentGame.getGrid().getBoxAt(x, y);
         button.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
+            if (event.getButton() == MouseButton.PRIMARY)
+            {
                 currentGame.revealCase(x, y);
+                Player currentPlayer = currentGame.getPlayer();
+
+                if (currentGame.getStatus() == 3)
+                {
+                    currentPlayer.incrementGamesPlayed();
+                    PlayerStorage.updatePlayer(currentGame.getPlayer());
+                    showEndGameMenu(false);
+                }
+                else if (currentGame.getStatus() == 2)
+                {
+                    currentPlayer.incrementGamesPlayed();
+                    currentPlayer.incrementGamesWon();
+                    PlayerStorage.updatePlayer(currentPlayer);
+                    showEndGameMenu(true);
+                }
 
                 if (clickedBox.getNbNeighborBombs() == 0)
                 {
@@ -112,6 +207,7 @@ public class MainApplication extends Application {
                 {
                     updateButtonImage(button, x, y);
                 }
+
             } else if (event.getButton() == MouseButton.SECONDARY) {
                 currentGame.flagCase(x, y);
                 updateButtonImage(button, x, y);
@@ -152,11 +248,31 @@ public class MainApplication extends Application {
         {
             for (int j = 0; j<GRID_SIZE; j++)
             {
-                Box box = currentGame.getGrid().getBoxAt(i, j);
                 Button button = buttons[i][j];
                 updateButtonImage(button, i, j);
             }
         }
+    }
+
+    private MenuBar createGameMenuBar()
+    {
+        MenuBar menuBar = new MenuBar();
+
+        Menu gameMenu = new Menu("Game");
+        MenuItem resetItem = new MenuItem("Reset");
+        MenuItem saveItem = new MenuItem("Save");
+        MenuItem loadItem = new MenuItem("Load");
+        MenuItem quitItem = new MenuItem("Quit");
+
+        resetItem.setOnAction(e -> resetGame());
+        saveItem.setOnAction(e -> saveGame());
+        loadItem.setOnAction(e -> loadGame());
+        quitItem.setOnAction(e -> primaryStage.close());
+
+        gameMenu.getItems().addAll(resetItem, saveItem, loadItem, quitItem);
+        menuBar.getMenus().add(gameMenu);
+
+        return menuBar;
     }
 
     private void loadImages()
@@ -175,7 +291,8 @@ public class MainApplication extends Application {
         imageMap.put("8", new Image("8.png", IMAGE_SIZE, IMAGE_SIZE, true, true));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         launch(args);
     }
 }

@@ -10,7 +10,13 @@ module com.minesweepergui.minesweeper_gui {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires com.google.gson;
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
 
     opens com.minesweepergui.minesweeper_gui to javafx.fxml;
     exports com.minesweepergui.minesweeper_gui;
+    exports game to com.fasterxml.jackson.databind;
+
+
 }
