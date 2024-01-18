@@ -10,7 +10,7 @@ module com.minesweepergui.minesweeper_gui {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
-    requires com.google.gson;
+
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
 

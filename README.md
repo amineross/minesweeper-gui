@@ -1,48 +1,54 @@
 ## Introduction
-Ce rapport présente notre plan de travail et notre stratégie de test pour le développement d'une application Java du jeu "Démineur"  (Mine Sweeper). Notre équipe est composée de trois membres : 
-- ROSTANE Mohammed Amine
-- TINESTI Mohamed Reda
-- JOUIMAA Salma 
 
-## Plan de travail
-### Répartition des Tâches
-- **Amine (Logique du Jeu)**
-    - Développer la logique principale du jeu.
-    - Implémenter les algorithmes pour la génération des mines et la détection des cases vides.
-    - S'assurer que la logique du jeu respecte les règles traditionnelles du démineur.
+These are the instructions for setting up and running the Minesweeper game project. This JavaFX application requires IntelliJ IDEA with JavaFX setup. Follow the steps below to get started. The final UML for this project is provided at the end of this file.
+
+## Prerequisites
+
+-   IntelliJ IDEA
+-   JavaFX SDK
+-   Maven (Integrated with IntelliJ IDEA)
+
+## Setup Instructions
+
+### Step 1: Prepare Your IntelliJ Project
+
+1.  **Create a New JavaFX Project**: Open IntelliJ IDEA and create a new JavaFX project. Choose an appropriate name for your project, such as `com.example.minesweeper`.
     
-- **Reda (Programmation Graphique)**
-    -   Mettre en place l'affichage en interface graphique (JavaFx).
-    -   S'assurer de l'interaction fluide entre l'utilisateur et l'interface graphique.
-    -   Collaborer avec Salma pour l'intégration du design des cases.
-
-- **Salma (Design de l'Interface et Programmation)**
-    -   Concevoir l'interface utilisateur du jeu.
-    -   Travailler avec Reda pour intégrer le design dans le jeu.
-    -   S'initier à la programmation en Java pour aider dans des tâches simples de codage.
- 
-## Plan de Tests
-
-### Tests de Développement (Unitaires et d'Intégration)
-
--   **Tests Unitaires** :
+2.  **Clone the Repository**: Clone or download the source code from the given repository.
     
-    -   Test de chaque méthode et classe individuellement.
-    -   S'assurer que chaque fonction retourne le résultat attendu dans différents scénarios.
--   **Tests d'Intégration** :
+3.  **Replace the `src` Folder**: Copy the `src` folder from the cloned repository and replace the `src` folder in your IntelliJ JavaFX project.
     
-    -   Test de l'intégration entre les différents composants du jeu.
-    -   S'assurer que les modules interagissent correctement.
 
-### Tests d'Utilisabilité et de Performance
+### Step 2: Configure Jackson Library
 
--   Tests avec des utilisateurs réels pour évaluer l'expérience utilisateur.
--   Tests de charge pour évaluer la performance sous différentes conditions.
+You will need to download Jackson Databind library (version 2.16.1) and add it to your project.
 
-### Assurance Qualité
+1.  **Download Jackson Databind JAR**: Download the Jackson Databind library JAR files (version 2.16.1) from a trusted source.
+    
+2.  **Add Jackson as a Library**:
+    
+    -   In IntelliJ, go to `File` -> `Project Structure`.
+    -   Under `Libraries`, click the `+` sign to add a new library.
+    -   Browse and select the downloaded Jackson Databind JAR files.
+    -   Click `OK` to add them to your project.
 
--   Utiliser **JavaLint** pour évaluer la qualité du code avec un objectif de score supérieur à 8/10.
--   Révision régulière du code entre les membres de l'équipe pour garantir les meilleures pratiques de codage.
+### Step 3: Update Maven Dependencies
 
-## Diagramme de classes UML
-![UML](uml.png)
+Add the following dependency to your `pom.xml` file for Maven:
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.16.1</version>
+</dependency>
+```
+
+### Step 4: Running the Application
+
+1.  **Open the MainApplication Class**: Navigate to the `MainApplication.java` file in the `src` folder.
+    
+2.  **Run the Application**: Right-click on the `MainApplication.java` file and select `Run 'MainApplication'` to start the application.
+
+## Final UML
+![FINAL_UML](final_uml.png)
