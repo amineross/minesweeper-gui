@@ -24,19 +24,36 @@ public class MainApplication extends Application {
     private static final int IMAGE_SIZE = 40;
     private static final int NUM_BOMBS = 10;
 
+    private Stage primaryStage;
     App app;
 
     Game currentGame;
     private Map<String, Image> imageMap = new HashMap<>();
     private Button[][] buttons = new Button[GRID_SIZE][GRID_SIZE];
 
+    private void showMainMenu()
+    {
+        MainMenu mainMenu = new MainMenu(this);
+        primaryStage.setScene(new Scene(mainMenu, 300, 200));
+        primaryStage.setTitle("Minesweeper Main Menu");
+        primaryStage.show();
+    }
+
     @Override
     public void start(Stage primaryStage)
     {
+        this.primaryStage = primaryStage;
+        showMainMenu();
+    }
+
+    public void startGame()
+    {
+        Player player = new Player("Amine");
+
         loadImages();
-        app = new App(GRID_SIZE, GRID_SIZE);
+        app = new App();
         app.startApplication();
-        app.startNewGame(GRID_SIZE, GRID_SIZE, NUM_BOMBS, GRID_SIZE);
+        app.startNewGame(GRID_SIZE, NUM_BOMBS, player);
 
         currentGame = app.getCurrentGame();
 
@@ -54,6 +71,16 @@ public class MainApplication extends Application {
         Scene scene = new Scene(gridPane);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void loadGame()
+    {
+        System.out.println("Load Game");
+    }
+
+    public void quitApplication()
+    {
+        primaryStage.close();
     }
 
 
@@ -90,9 +117,9 @@ public class MainApplication extends Application {
     {
         Box box = currentGame.getGrid().getBoxAt(x, y);
 
-        if (box.revealed())
+        if (box.isRevealed())
         {
-            if (box.containsBomb())
+            if (box.getContainsBomb())
             {
                 button.setGraphic(new ImageView(imageMap.get("bomb")));
             } else if (box.getNbNeighborBombs() > 0)
@@ -102,7 +129,7 @@ public class MainApplication extends Application {
             {
                 button.setGraphic(new ImageView(imageMap.get("none2")));
             }
-        } else if (box.flagged())
+        } else if (box.isFlagged())
         {
             button.setGraphic(new ImageView(imageMap.get("flag")));
         } else
