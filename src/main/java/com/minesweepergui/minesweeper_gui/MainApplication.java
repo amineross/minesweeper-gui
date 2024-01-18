@@ -31,11 +31,19 @@ public class MainApplication extends Application {
     private Map<String, Image> imageMap = new HashMap<>();
     private Button[][] buttons = new Button[GRID_SIZE][GRID_SIZE];
 
-    private void showMainMenu()
+    public void showMainMenu()
     {
         MainMenu mainMenu = new MainMenu(this);
         primaryStage.setScene(new Scene(mainMenu, 300, 200));
         primaryStage.setTitle("Minesweeper Main Menu");
+        primaryStage.show();
+    }
+
+    private void showEndGameMenu(boolean isGameWon)
+    {
+        EndGameMenu endGameMenu = new EndGameMenu(this, isGameWon);
+        primaryStage.setScene(new Scene(endGameMenu, 300, 200));
+        primaryStage.setTitle(isGameWon ? "Game Won" : "Game");
         primaryStage.show();
     }
 
