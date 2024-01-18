@@ -45,6 +45,16 @@ public class Grid
         }
     }
 
+    public Box[][] getBoxes()
+    {
+        return this.boxes;
+    }
+
+    public Box getBoxAt(int x, int y)
+    {
+        return this.boxes[x][y];
+    }
+
     private void updateNeighborBoxes(int x, int y)
     {
         for (int i = x - 1; i <= x+1 ; i++)
@@ -60,20 +70,31 @@ public class Grid
     }
     public void revealBox(int x, int y)
     {
-        if (x >= dimension || y >= dimension)
+        if (x < 0 || x >= dimension || y < 0 || y >= dimension)
         {
-            System.exit(0);
+            return;
         }
 
         Box box = boxes[x][y];
-        if (!box.revealed())
-        {
-            box.setRevealed();
+
+        if (box.revealed() || box.containsBomb()) {
+            return;
         }
 
-        if (box.containsBomb())
+        box.setRevealed();
+
+        if (box.getNbNeighborBombs() == 0)
         {
-            //box.setRevealed(); TODO: gameover
+            for (int i = x - 1; i <= x + 1; i++)
+            {
+                for (int j = y - 1; j <= y + 1; j++)
+                {
+                    if (i != x || j != y)
+                    {
+                        revealBox(i, j);
+                    }
+                }
+            }
         }
     }
 

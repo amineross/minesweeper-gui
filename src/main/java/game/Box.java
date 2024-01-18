@@ -30,6 +30,8 @@ public class Box
         return revealed;
     }
 
+    public boolean flagged() {return flagged; }
+
     public void setRevealed()
     {
         this.revealed = true;
