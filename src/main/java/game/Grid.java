@@ -1,12 +1,16 @@
 package game;
 import java.util.Random;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Grid
 {
-    private final int dimension;
+    private int dimension;
     private final int nbBombs;
     private Box[][] boxes;
 
-    public Grid(int dimension, int nbBombs)
+    public Grid( @JsonProperty("dimension") int dimension, @JsonProperty("nbBombs") int nbBombs)
     {
         this.dimension = dimension;
         this.nbBombs = nbBombs;
@@ -36,7 +40,7 @@ public class Grid
             int x = random.nextInt(dimension);
             int y = random.nextInt(dimension);
 
-            if (!boxes[x][y].containsBomb())
+            if (!boxes[x][y].getContainsBomb())
             {
                 boxes[x][y].setContainsBomb(true);
                 nbBombsSet++;
@@ -77,11 +81,11 @@ public class Grid
 
         Box box = boxes[x][y];
 
-        if (box.revealed() || box.containsBomb()) {
+        if (box.isRevealed() || box.getContainsBomb()) {
             return;
         }
 
-        box.setRevealed();
+        box.setRevealed(true);
 
         if (box.getNbNeighborBombs() == 0)
         {
@@ -102,7 +106,7 @@ public class Grid
     {
         if (x < dimension && y < dimension)
         {
-            boxes[x][y].setFlagged();
+            boxes[x][y].setFlagged(true);
         }
     }
 
@@ -113,9 +117,9 @@ public class Grid
             for (int j = 0; j<dimension; j++)
             {
                 Box box = boxes[i][j];
-                if (box.revealed())
+                if (box.isRevealed())
                 {
-                    if (box.containsBomb())
+                    if (box.getContainsBomb())
                     {
                         System.out.print("*");
                     } else if (box.getNbNeighborBombs() != 0)
@@ -132,5 +136,39 @@ public class Grid
             }
             System.out.println();
         }
+    }
+
+    public void resetGrid()
+    {
+        for (int i = 0; i<dimension; i++)
+        {
+            for (int j = 0; j<dimension; j++)
+            {
+                boxes[i][j].setRevealed(false);
+            }
+        }
+    }
+
+    public void revealGrid()
+    {
+        for (int i = 0; i<dimension; i++)
+        {
+            for (int j = 0; j<dimension; j++)
+            {
+                boxes[i][j].setRevealed(true);
+            }
+        }
+    }
+    public int getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(int dimension)
+    {
+        this.dimension = dimension;
+    }
+
+    public void setBoxes(Box[][] boxes) {
+        this.boxes = boxes;
     }
 }

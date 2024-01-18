@@ -20,26 +20,30 @@ public class Box
         this.containsBomb = containsBomb;
     }
 
-    public boolean containsBomb()
+    public boolean getContainsBomb()
     {
         return this.containsBomb;
     }
 
-    public boolean revealed()
+    public boolean isRevealed()
     {
         return revealed;
     }
 
-    public boolean flagged() {return flagged; }
+    public boolean isFlagged() {return flagged; }
 
-    public void setRevealed()
+    public void setRevealed(boolean revealed)
     {
-        this.revealed = true;
+        this.revealed = revealed;
     }
 
-    public void setFlagged()
+    public void setFlagged(boolean flagged)
     {
-        this.flagged = !this.flagged;
+        this.flagged = flagged;
+    }
+
+    public void setNbNeighborBombs(int nbNeighborBombs) {
+        this.nbNeighborBombs = nbNeighborBombs;
     }
 
     public int getNbNeighborBombs()

@@ -1,12 +1,16 @@
 package game;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Player
 {
     private String name;
     private int nbGamesPlayed;
     private int nbGamesWon;
 
-    public Player(String name)
+    @JsonCreator
+    public Player(@JsonProperty("name") String name)
     {
         this.name = name;
         this.nbGamesPlayed = 0;
