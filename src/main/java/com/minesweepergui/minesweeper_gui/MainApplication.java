@@ -21,8 +21,108 @@ import java.util.Random;
 
 public class MainApplication extends Application {
     private static final int GRID_SIZE = 10;
-    private static final int NUM_IMAGES = 7;
+    private static final int IMAGE_SIZE = 40;
     private static final int NUM_BOMBS = 10;
+
+    App app;
+
+    Game currentGame;
+    private Map<String, Image> imageMap = new HashMap<>();
+    private Button[][] buttons = new Button[GRID_SIZE][GRID_SIZE];
+
+    @Override
+    public void start(Stage primaryStage)
+    {
+        loadImages();
+        app = new App(GRID_SIZE, GRID_SIZE);
+        app.startApplication();
+        app.startNewGame(GRID_SIZE, GRID_SIZE, NUM_BOMBS, GRID_SIZE);
+
+        currentGame = app.getCurrentGame();
+
+        primaryStage.setTitle("Minesweeper");
+        GridPane gridPane = new GridPane();
+
+        for (int i = 0; i < GRID_SIZE; i++) {
+            for (int j = 0; j < GRID_SIZE; j++) {
+                Button button = createButton(i, j);
+                gridPane.add(button, j, i);
+                buttons[i][j] = button;
+            }
+        }
+
+        Scene scene = new Scene(gridPane);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+
+    private Button createButton(int x, int y)
+    {
+        Button button = new Button();
+
+        button.setGraphic(new ImageView(imageMap.get("hidden")));
+        button.setMinSize(IMAGE_SIZE, IMAGE_SIZE);
+        button.setMaxSize(IMAGE_SIZE, IMAGE_SIZE);
+
+        Box clickedBox = currentGame.getGrid().getBoxAt(x, y);
+        button.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                currentGame.revealCase(x, y);
+
+                if (clickedBox.getNbNeighborBombs() == 0)
+                {
+                    updateAllButtonImages();
+                } else
+                {
+                    updateButtonImage(button, x, y);
+                }
+            } else if (event.getButton() == MouseButton.SECONDARY) {
+                currentGame.flagCase(x, y);
+                updateButtonImage(button, x, y);
+            }
+        });
+
+        return button;
+    }
+
+    private void updateButtonImage(Button button, int x, int y)
+    {
+        Box box = currentGame.getGrid().getBoxAt(x, y);
+
+        if (box.revealed())
+        {
+            if (box.containsBomb())
+            {
+                button.setGraphic(new ImageView(imageMap.get("bomb")));
+            } else if (box.getNbNeighborBombs() > 0)
+            {
+                button.setGraphic(new ImageView(imageMap.get(String.valueOf(box.getNbNeighborBombs()))));
+            } else
+            {
+                button.setGraphic(new ImageView(imageMap.get("none2")));
+            }
+        } else if (box.flagged())
+        {
+            button.setGraphic(new ImageView(imageMap.get("flag")));
+        } else
+        {
+            button.setGraphic(new ImageView(imageMap.get("hidden")));
+        }
+    }
+
+    private void updateAllButtonImages()
+    {
+        for (int i = 0; i<GRID_SIZE; i++)
+        {
+            for (int j = 0; j<GRID_SIZE; j++)
+            {
+                Box box = currentGame.getGrid().getBoxAt(i, j);
+                Button button = buttons[i][j];
+                updateButtonImage(button, i, j);
+            }
+        }
+    }
 
     private void loadImages()
     {
@@ -39,7 +139,7 @@ public class MainApplication extends Application {
         imageMap.put("7", new Image("7.png", IMAGE_SIZE, IMAGE_SIZE, true, true));
         imageMap.put("8", new Image("8.png", IMAGE_SIZE, IMAGE_SIZE, true, true));
     }
-    
+
     public static void main(String[] args) {
         launch(args);
     }
